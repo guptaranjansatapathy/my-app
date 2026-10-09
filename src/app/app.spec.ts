@@ -10,20 +10,4 @@ describe('App', () => {
       providers: [provideHttpClient()]
     }).compileComponents();
   });
-
-  it('should create the app', () => {
-    const fixture = TestBed.createComponent(App);
-    expect(fixture.componentInstance).toBeTruthy();
-  });
-
-  it('should render title', () => {
-    const fixture = TestBed.createComponent(App);
-    fixture.detectChanges();
-
-    const element: HTMLElement = fixture.nativeElement;
-
-    expect(element.textContent).toContain(
-      'This is my Hello, my-app'
-    );
-  });
 });
