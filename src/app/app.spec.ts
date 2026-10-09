@@ -15,11 +15,18 @@ describe('App', () => {
     expect(app).toBeTruthy();
   });
 
-    it('should render title', async () => {
-    const fixture = TestBed.createComponent(App);
-    await fixture.whenStable();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('This is my Hello, my-app');
-  });
+
+it('should render title', () => {
+  const fixture = TestBed.createComponent(App);
+  fixture.detectChanges();
+
+  const heading: HTMLElement | null =
+    fixture.nativeElement.querySelector('h1');
+
+  expect(heading).not.toBeNull();
+  expect(heading?.textContent).toContain(
+    'This is my Hello, my-app'
+  );
+});
 
 });
