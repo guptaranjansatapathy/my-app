@@ -2,7 +2,7 @@ name: Deploy Angular App
 
 on:
   push:
-    branches: ["main"] # or master
+    branches: ["main"]
 
 permissions:
   contents: read
@@ -36,14 +36,13 @@ jobs:
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
-        with: 
-          enablement: true
+        # Removed enablement: true since Pages is already enabled manually
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Replace 'my-app' with your actual output directory inside dist/
-          path: './dist/my-app/browser' 
+          # Verify this matches your output folder in dist/
+          path: './dist/my-app/browser'
 
       - name: Deploy to GitHub Pages
         id: deployment
