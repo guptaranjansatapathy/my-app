@@ -12,7 +12,7 @@ import { FormsModule } from '@angular/forms';
 export class App {
   constructor(private http: HttpClient){}
 // Removed trailing slash to prevent double slashes in HTTP calls
-  API = 'https://mocki.io/v1/7a160057-f33b-4b53-a986-a7c2baaad2d0';
+  API = 'https://jsonplaceholder.typicode.com/posts';
   
   showInfodata: any[] = [];
   infoAdd: string = '';
