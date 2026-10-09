@@ -1,105 +1,91 @@
-
-import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-interface InfoItem {
-  id: number;
-  title: string;
-  checked?: boolean;
-}
-
 @Component({
-  selector: 'app-root',
-  standalone: true,
   imports: [CommonModule, FormsModule],
+  selector: 'app-root',
+  styleUrl: './app.scss',
   templateUrl: './app.html',
-  styleUrl: './app.scss'
 })
-export class App implements OnInit {
-  private readonly http = inject(HttpClient);
+export class App {
+  constructor(private http: HttpClient){}
+// Removed trailing slash to prevent double slashes in HTTP calls
+  API = 'https://jsonplaceholder.typicode.com/posts';
+  
+  showInfodata: any[] = [];
+  infoAdd: string = '';
+  infoId: number = 0;
 
-  readonly API = 'https://jsonplaceholder.typicode.com/posts';
-
-  showInfodata: InfoItem[] = [];
-  infoAdd = '';
-  infoId = 0;
-
-  ngOnInit(): void {
-    this.showInfo();
-  }
-
-  showInfo(): void {
-    this.http.get<InfoItem[]>(this.API).subscribe({
+  showInfo() {
+    this.http.get<any[]>(this.API).subscribe({
       next: (res) => {
         this.showInfodata = res;
       },
       error: (err) => {
-        console.error('Error fetching data:', err);
+        console.error('Error occurred while fetching:', err);
       }
     });
   }
 
-  addInfo(): void {
+  addInfo() {
     const title = this.infoAdd.trim();
     if (!title) return;
 
-    this.http.post<InfoItem>(this.API, { title }).subscribe({
+    const payLoad = { title };
+    this.http.post<any>(this.API, payLoad).subscribe({
       next: (res) => {
-        this.showInfodata = [
-          ...this.showInfodata,
-          { ...res, checked: false }
-        ];
+        this.showInfodata = [...this.showInfodata, res];
         this.infoAdd = '';
       },
       error: (err) => {
-        console.error('Error adding data:', err);
+        console.error('Error occurred while adding:', err);
       }
     });
   }
 
-  getInfo(item: InfoItem): void {
-    this.infoId = item.id;
-    this.infoAdd = item.title;
+  getInfo(value: any) {
+    this.infoId = value.id;
+    this.infoAdd = value.title;
   }
 
-  updateInfo(): void {
+  updateInfo() {
     const title = this.infoAdd.trim();
     if (!this.infoId || !title) return;
 
-    const id = this.infoId;
+    // Send the structured object payload instead of raw string 'title'
+    const payLoad = { id: this.infoId, title };
 
-    this.http.put<InfoItem>(`${this.API}/${id}`, {
-      id,
-      title
-    }).subscribe({
+    this.http.put<any>(`${this.API}/${this.infoId}`, payLoad).subscribe({
       next: (res) => {
-        this.showInfodata = this.showInfodata.map(item =>
-          item.id === id
-            ? { ...item, title: res?.title ?? title }
-            : item
+        // Fallback to updated payload properties if API returns incomplete payload
+        const updatedItem = res.title ? res : { id: this.infoId, title };
+        this.showInfodata = this.showInfodata.map((item) =>
+          item.id === this.infoId ? updatedItem : item
         );
-
         this.infoAdd = '';
         this.infoId = 0;
       },
       error: (err) => {
-        console.error('Error updating data:', err);
+        console.error('Error occurred while updating:', err);
       }
     });
   }
 
-  deleteInfo(id: number): void {
+  deleteInfo(id: number) {
     this.http.delete(`${this.API}/${id}`).subscribe({
       next: () => {
-        this.showInfodata = this.showInfodata.filter(
-          item => item.id !== id
-        );
+        this.showInfodata = this.showInfodata.filter((item) => item.id !== id);
       },
       error: (err) => {
-        console.error('Error deleting data:', err);
+        console.error('Error occurred while deleting:', err);
       }
     });
   }
+
+  ngOnInit(): void {
+    this.showInfo();
+  }
+  
 }
